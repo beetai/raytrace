@@ -1,3 +1,5 @@
+#include "vec3.h"
+
 #include <iostream>
 
 int main() {
@@ -10,13 +12,17 @@ int main() {
         std::cerr << "\rScanlines remaining: " << j << ' ' << std::flush;
         for (int i = 0; i < image_width; ++i) {
             // first print:
-            auto r = double(i) / image_width;
-            auto g = double(j) / image_height;
-            auto b = 0.2;
-            int ir = static_cast<int>(255.999 * r);
-            int ig = static_cast<int>(255.999 * g);
-            int ib = static_cast<int>(255.999 * b);
-            std::cout << ir << ' ' << ig << ' ' << ib << '\n';
+            // auto r = double(i) / image_width;
+            // auto g = double(j) / image_height;
+            // auto b = 0.2;
+            // int ir = static_cast<int>(255.999 * r);
+            // int ig = static_cast<int>(255.999 * g);
+            // int ib = static_cast<int>(255.999 * b);
+            // std::cout << ir << ' ' << ig << ' ' << ib << '\n';
+
+            // first print using vec3.h:
+            vec3 colour(double(i) / image_width, double(j) / image_height, 0.2);
+            colour.writeColor(std::cout);
         }
     }
     std::cerr << "\nDone.\n";
