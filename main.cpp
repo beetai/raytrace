@@ -2,7 +2,7 @@
 
 #include <iostream>
 
-bool hitSphere(const vec3 &center, double radius, const ray &r) {
+double hitSphere(const vec3 &center, double radius, const ray &r) {
     // construct quadratic formula, return discriminant > 0
     // discriminant is larger than zero if ray intersects with sphere at two points
     vec3 centerVec = r.origin() - center;
@@ -10,14 +10,29 @@ bool hitSphere(const vec3 &center, double radius, const ray &r) {
     auto b = 2 * dot(r.direction(), centerVec);
     auto c = dot(centerVec, centerVec) - radius * radius;
     double discriminant = b*b - 4*a*c;
-    return discriminant > 0;
+    if (discriminant < 0) {
+        return -1;
+    } else {
+        return (-b - sqrt(discriminant)) / (2*a);
+    }
 }
 
 vec3 rayColour(const ray &r) {
-    if (hitSphere(vec3(0,0,-1), 0.5, r))
-        return vec3(1.0, 0.0, 0.0);
+    // basic sphere sollision test (hitSphere() only checks if ray hits sphere):
+    // if (hitSphere(vec3(0,0,-1), 0.5, r))
+    //     return vec3(1.0, 0.0, 0.0);
+
+    // norm visualization:
+    vec3 center = vec3(0,0,-1);
+    auto t = hitSphere(center, 0.5, r);
+    if (t > 0) {
+        // get point of contact
+        vec3 pc = r.at(t);
+        vec3 surfNorm = unitVector(pc - center);
+        return 0.5*(surfNorm + vec3(1.0, 1.0, 1.0));
+    }
     vec3 unitDir = unitVector(r.direction());
-    auto t = 0.5*(unitDir.y() + 1.0); // this scales the unit vector's y value from [-1, 1] to a scale of [0, 1]
+    t = 0.5*(unitDir.y() + 1.0); // this scales the unit vector's y value from [-1, 1] to a scale of [0, 1]
     // blendedVal = (1-t)*initVal + t*andVal
     // we return: (1-t)*white + t*blue
     return (1.0-t)*vec3(1.0, 1.0, 1.0) + t*vec3(0.5, 0.7, 1.0);
