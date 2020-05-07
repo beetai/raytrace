@@ -6,14 +6,14 @@ double hitSphere(const vec3 &center, double radius, const ray &r) {
     // construct quadratic formula, return discriminant > 0
     // discriminant is larger than zero if ray intersects with sphere at two points
     vec3 centerVec = r.origin() - center;
-    auto a = dot(r.direction(), r.direction());
-    auto b = 2 * dot(r.direction(), centerVec);
-    auto c = dot(centerVec, centerVec) - radius * radius;
-    double discriminant = b*b - 4*a*c;
+    auto a = r.direction().sumOfSquare();
+    auto halfB = dot(r.direction(), centerVec);
+    auto c = centerVec.sumOfSquare() - radius * radius;
+    double discriminant = halfB*halfB - a*c;
     if (discriminant < 0) {
         return -1;
     } else {
-        return (-b - sqrt(discriminant)) / (2*a);
+        return (-halfB - sqrt(discriminant)) / a;
     }
 }
 
