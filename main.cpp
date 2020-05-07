@@ -2,7 +2,20 @@
 
 #include <iostream>
 
+bool hitSphere(const vec3 &center, double radius, const ray &r) {
+    // construct quadratic formula, return discriminant > 0
+    // discriminant is larger than zero if ray intersects with sphere at two points
+    vec3 centerVec = r.origin() - center;
+    auto a = dot(r.direction(), r.direction());
+    auto b = 2 * dot(r.direction(), centerVec);
+    auto c = dot(centerVec, centerVec) - radius * radius;
+    double discriminant = b*b - 4*a*c;
+    return discriminant > 0;
+}
+
 vec3 rayColour(const ray &r) {
+    if (hitSphere(vec3(0,0,-1), 0.5, r))
+        return vec3(1.0, 0.0, 0.0);
     vec3 unitDir = unitVector(r.direction());
     auto t = 0.5*(unitDir.y() + 1.0); // this scales the unit vector's y value from [-1, 1] to a scale of [0, 1]
     // blendedVal = (1-t)*initVal + t*andVal
