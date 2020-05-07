@@ -1,12 +1,24 @@
-#include "vec3.h"
+#include "ray.h"
 
 #include <iostream>
+
+vec3 rayColour(const ray &r) {
+    vec3 unitDir = unitVector(r.direction());
+    auto t = 0.5*(unitDir.y() + 1.0); // this scales the unit vector's y value from [-1, 1] to a scale of [0, 1]
+    // blendedVal = (1-t)*initVal + t*andVal
+    // we return: (1-t)*white + t*blue
+    return (1.0-t)*vec3(1.0, 1.0, 1.0) + t*vec3(0.5, 0.7, 1.0);
+}
 
 int main() {
     const int image_width = 200;
     const int image_height = 100;
 
     std::cout << "P3\n" << image_width << ' '  << image_height << "\n255\n";
+
+    // define coordinate constants
+    vec3 lowerLeftCorner(-2.0, -1.0, -1.0);
+    vec3 orig(0.0, 0.0, 0.0);
 
     for (int j = image_height-1; j >= 0; --j) {
         std::cerr << "\rScanlines remaining: " << j << ' ' << std::flush;
@@ -21,8 +33,17 @@ int main() {
             // std::cout << ir << ' ' << ig << ' ' << ib << '\n';
 
             // first print using vec3.h:
-            vec3 colour(double(i) / image_width, double(j) / image_height, 0.2);
-            colour.writeColor(std::cout);
+            // vec3 colour(double(i) / image_width, double(j) / image_height, 0.2);
+            // colour.writeColour(std::cout);
+
+            // for each pixel, create a ray from origin to that pixel
+            // get coordinate of pixel
+            auto u = double(i) / image_width;
+            auto v = double(j) / image_height;
+            vec3 pixelCoord = lowerLeftCorner + vec3(u * 4.0, 0.0, 0.0) + vec3(0.0, v * 2.0, 0.0);
+            // get colour of ray and write
+            ray pixelRay = ray(orig, pixelCoord);
+            rayColour(pixelRay).writeColour(std::cout);
         }
     }
     std::cerr << "\nDone.\n";

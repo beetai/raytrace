@@ -49,7 +49,7 @@ struct vec3 {
             return sqrt(sumOfSquare());
         }
 
-        void writeColor(std::ostream &out) { // TODO: make sense of the parameter
+        void writeColour(std::ostream &out) { // TODO: make sense of the parameter
             // Write the translated [0,255] value of each component
             out << static_cast<int>(255.999 * e[0]) << ' '
                 << static_cast<int>(255.999 * e[1]) << ' '
@@ -105,6 +105,6 @@ inline vec3 cross(const vec3 &u, const vec3 &v) {
                 u.e[0] * v.e[1] -  u.e[1] * v.e[0]);
 }
 
-inline vec3 unit_vector(vec3 v) {
+inline vec3 unitVector(vec3 v) {
     return v / v.length();
 }
