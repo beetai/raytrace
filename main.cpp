@@ -1,38 +1,33 @@
-#include "ray.h"
+#include "rtweekend.h"
+
+#include "hittable_list.h"
+#include "sphere.h"
 
 #include <iostream>
 
-double hitSphere(const vec3 &center, double radius, const ray &r) {
-    // construct quadratic formula, return discriminant > 0
-    // discriminant is larger than zero if ray intersects with sphere at two points
-    vec3 centerVec = r.origin() - center;
-    auto a = r.direction().sumOfSquare();
-    auto halfB = dot(r.direction(), centerVec);
-    auto c = centerVec.sumOfSquare() - radius * radius;
-    double discriminant = halfB*halfB - a*c;
-    if (discriminant < 0) {
-        return -1;
-    } else {
-        return (-halfB - sqrt(discriminant)) / a;
-    }
-}
-
-vec3 rayColour(const ray &r) {
-    // basic sphere sollision test (hitSphere() only checks if ray hits sphere):
+vec3 rayColour(const ray& r, const hittable& world) {
+    // basic sphere collision test (hitSphere() only checks if ray hits sphere):
     // if (hitSphere(vec3(0,0,-1), 0.5, r))
     //     return vec3(1.0, 0.0, 0.0);
 
     // norm visualization:
-    vec3 center = vec3(0,0,-1);
-    auto t = hitSphere(center, 0.5, r);
-    if (t > 0) {
-        // get point of contact
-        vec3 pc = r.at(t);
-        vec3 surfNorm = unitVector(pc - center);
-        return 0.5*(surfNorm + vec3(1.0, 1.0, 1.0));
+    // vec3 center = vec3(0,0,-1);
+    // auto t = hitSphere(center, 0.5, r);
+    // if (t > 0) {
+    //     // get point of contact
+    //     vec3 pc = r.at(t);
+    //     vec3 surfNorm = unitVector(pc - center);
+    //     return 0.5*(surfNorm + vec3(1.0, 1.0, 1.0));
+    // }
+
+    hitRecord rec;
+    if (world.hit(r, 0, infinity, rec)) {
+        return 0.5*(rec.normal + vec3(1.0, 1.0, 1.0));
     }
+
+    // render blue white gradient bg
     vec3 unitDir = unitVector(r.direction());
-    t = 0.5*(unitDir.y() + 1.0); // this scales the unit vector's y value from [-1, 1] to a scale of [0, 1]
+    auto t = 0.5*(unitDir.y() + 1.0); // this scales the unit vector's y value from [-1, 1] to a scale of [0, 1]
     // blendedVal = (1-t)*initVal + t*andVal
     // we return: (1-t)*white + t*blue
     return (1.0-t)*vec3(1.0, 1.0, 1.0) + t*vec3(0.5, 0.7, 1.0);
@@ -47,6 +42,10 @@ int main() {
     // define coordinate constants
     vec3 lowerLeftCorner(-2.0, -1.0, -1.0);
     vec3 orig(0.0, 0.0, 0.0);
+
+    hittableList world;
+    world.add(make_shared<sphere>(vec3(0,0,-1), 0.5));
+    world.add(make_shared<sphere>(vec3(0,-100.5,-1), 100));
 
     for (int j = image_height-1; j >= 0; --j) {
         std::cerr << "\rScanlines remaining: " << j << ' ' << std::flush;
@@ -71,7 +70,7 @@ int main() {
             vec3 pixelCoord = lowerLeftCorner + vec3(u * 4.0, 0.0, 0.0) + vec3(0.0, v * 2.0, 0.0);
             // get colour of ray and write
             ray pixelRay = ray(orig, pixelCoord);
-            rayColour(pixelRay).writeColour(std::cout);
+            rayColour(pixelRay, world).writeColour(std::cout);
         }
     }
     std::cerr << "\nDone.\n";

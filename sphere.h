@@ -33,7 +33,7 @@ bool sphere::hit(const ray& r, double t_min, double t_max, hitRecord& rec) const
             return true;
         }
         // take second t value where hit occurs
-        auto t = (-halfB + sqrt(discriminant)) / a;
+        t = (-halfB + sqrt(discriminant)) / a;
         if (t < t_max && t > t_min) {
             rec.t = t;
             rec.point = r.at(t);
