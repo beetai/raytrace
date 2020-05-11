@@ -5,23 +5,23 @@
 #include "ray.h"
 class material;     // alert compiler that the pointer is to a class
 
-struct hitRecord {
+struct hit_record {
     vec3 point;
     vec3 normal;
     shared_ptr<material> mat_ptr;
     double t;
-    bool frontFace;
+    bool front_face;
 
-    inline void setFaceNormal(const ray& r, const vec3& outwardNormal) {
+    inline void set_face_normal(const ray& r, const vec3& outward_normal) {
         // if ray and outward norm are in same dir, ray is inside, else it is outside
-        frontFace = dot(r.direction(), outwardNormal) < 0;
-        normal = frontFace ? outwardNormal : -outwardNormal;
+        front_face = dot(r.direction(), outward_normal) < 0;
+        normal = front_face ? outward_normal : -outward_normal;
     }
 };
 
 class hittable {
     public:
-        virtual bool hit(const ray& r, double t_min, double t_max, hitRecord& rec) const = 0;
+        virtual bool hit(const ray& r, double t_min, double t_max, hit_record& rec) const = 0;
 };
 
 #endif /* HITTABLE_H */

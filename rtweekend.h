@@ -15,7 +15,7 @@ const double pi = 3.14159265358979323846;
 const double infinity = std::numeric_limits<double>::infinity();    // Representation of positive infinity, if available.
 
 // Utilities
-inline double degreesToRadians(double degrees) {
+inline double degrees_to_radians(double degrees) {
     return degrees * pi / 180;
 }
 

@@ -7,23 +7,23 @@ class camera {
     public:
         camera() {
             origin = vec3(0,0,0);
-            lowerLeftCorner = vec3(-2,-1,-1);
-            frameWidth = 4.0;
-            frameHeight = 2.0;
+            lower_left_corner = vec3(-2,-1,-1);
+            frame_width = 4.0;
+            frame_height = 2.0;
         }
 
-        ray getRay(double u, double v) {
-            vec3 pointCoord = lowerLeftCorner + vec3(u * frameWidth, 0.0, 0.0) + vec3(0.0, v * frameHeight, 0.0) - origin;
-            return ray(origin, pointCoord);
+        ray get_ray(double u, double v) {
+            vec3 point_coord = lower_left_corner + vec3(u * frame_width, 0.0, 0.0) + vec3(0.0, v * frame_height, 0.0) - origin;
+            return ray(origin, point_coord);
         }
 
     public:
         vec3 origin;
-        vec3 lowerLeftCorner;
-        // vec3 frameWidth;
-        double frameWidth;
-        // vec3 frameHeight;
-        double frameHeight;
+        vec3 lower_left_corner;
+        // vec3 frame_width;
+        double frame_width;
+        // vec3 frame_height;
+        double frame_height;
 };
 
 #endif /* CAMERA_H */

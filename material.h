@@ -7,7 +7,7 @@
 class material {
     public:
         virtual bool scatter(
-            const ray& ray_in, const hitRecord& rec, vec3& attenuation, ray& ray_out
+            const ray& ray_in, const hit_record& rec, vec3& attenuation, ray& ray_out
         ) const = 0;
 };
 
@@ -23,10 +23,10 @@ class lambertian: public material {
         lambertian(const vec3& a) : albedo(a) {}
 
         virtual bool scatter(
-            const ray& ray_in, const hitRecord& rec, vec3& attenuation, ray& ray_out
+            const ray& ray_in, const hit_record& rec, vec3& attenuation, ray& ray_out
         ) const {
-            vec3 scatterDir = rec.normal + randomUnitVector();
-            ray_out = ray(const_cast<vec3&>(rec.point), scatterDir);
+            vec3 scatter_dir = rec.normal + random_unit_vector();
+            ray_out = ray(const_cast<vec3&>(rec.point), scatter_dir);
             attenuation = albedo;
             return true;
         };
@@ -40,11 +40,11 @@ class metal: public material {
         metal(const vec3& a, double f) : albedo(a), fuzz(clamp(f, 0, 1)) {}
 
         virtual bool scatter(
-            const ray& ray_in, const hitRecord& rec, vec3& attenuation, ray& ray_out
+            const ray& ray_in, const hit_record& rec, vec3& attenuation, ray& ray_out
         ) const {
-            vec3 reflectDir = reflect(unitVector(ray_in.direction()), rec.normal);
-            reflectDir += fuzz*randomInUnitSphere();
-            ray_out = ray(const_cast<vec3&>(rec.point), reflectDir);
+            vec3 reflect_dir = reflect(unit_vector(ray_in.direction()), rec.normal);
+            reflect_dir += fuzz*random_in_unit_sphere();
+            ray_out = ray(const_cast<vec3&>(rec.point), reflect_dir);
             attenuation = albedo;
             return true;
         };
@@ -60,34 +60,34 @@ class dielectric: public material {
         dielectric(double ri) : ref_idx(ri) {}
 
         virtual bool scatter(
-            const ray& ray_in, const hitRecord& rec, vec3& attenuation, ray& ray_out
+            const ray& ray_in, const hit_record& rec, vec3& attenuation, ray& ray_out
         ) const {
             attenuation = vec3(1,1,1);      // glass/dielectric surface absorbs nothing
             // determine if air->sphere refraction or sphere->air refraction
             double eta_over_etap;
-            if (rec.frontFace) {
+            if (rec.front_face) {
                 eta_over_etap = 1 / ref_idx;
             } else {
                 eta_over_etap = ref_idx;
             }
 
             // determine if reflect or refract
-            vec3 unit_dir_in = unitVector(ray_in.direction());
+            vec3 unit_dir_in = unit_vector(ray_in.direction());
 
             double cos_theta = ffmin(dot(-unit_dir_in, rec.normal), 1.0);
             double sin_theta = sqrt(1.0 - cos_theta*cos_theta);
             if (eta_over_etap * sin_theta > 1.0) {
                 // no solution to Snell's law: must reflect
-                vec3 reflectDir = reflect(unit_dir_in, rec.normal);
-                ray_out = ray(const_cast<vec3&>(rec.point), reflectDir);
+                vec3 reflect_dir = reflect(unit_dir_in, rec.normal);
+                ray_out = ray(const_cast<vec3&>(rec.point), reflect_dir);
                 return true;
             }
 
             // can refract
             double reflect_prob = schlick(cos_theta, eta_over_etap);
             if (random_double() < reflect_prob) {
-                vec3 reflectDir = reflect(unit_dir_in, rec.normal);
-                ray_out = ray(const_cast<vec3&>(rec.point), reflectDir);
+                vec3 reflect_dir = reflect(unit_dir_in, rec.normal);
+                ray_out = ray(const_cast<vec3&>(rec.point), reflect_dir);
                 return true;
             }
             vec3 refract_dir = refract(unit_dir_in, rec.normal, eta_over_etap);
