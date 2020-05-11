@@ -6,31 +6,20 @@
 
 #include <iostream>
 
-vec3 rayColour(const ray& r, const hittable& world) {
-    // basic sphere collision test (hitSphere() only checks if ray hits sphere):
-    // if (hitSphere(vec3(0,0,-1), 0.5, r))
-    //     return vec3(1.0, 0.0, 0.0);
-
-    // norm visualization:
-    // vec3 center = vec3(0,0,-1);
-    // auto t = hitSphere(center, 0.5, r);
-    // if (t > 0) {
-    //     // get point of contact
-    //     vec3 pc = r.at(t);
-    //     vec3 surfNorm = unitVector(pc - center);
-    //     return 0.5*(surfNorm + vec3(1.0, 1.0, 1.0));
-    // }
+vec3 rayColour(const ray& r, const hittable& world, int depth) {
+    // exceeded ray bounce limit, no more light gathered
+    if (depth <= 0) return vec3(0,0,0);
 
     hitRecord rec;
     if (world.hit(r, 0, infinity, rec)) {
-        return 0.5*(rec.normal + vec3(1.0, 1.0, 1.0));
+        // return 0.5*(rec.normal + vec3(1.0, 1.0, 1.0));      // norm visualizer
+        vec3 target = rec.normal + randomInUnitSphere();
+        return 0.5 * rayColour(ray(rec.point, target), world, depth-1);  // new ray points randomly outward from surface of contact
     }
 
     // render blue white gradient bg
     vec3 unitDir = unitVector(r.direction());
     auto t = 0.5*(unitDir.y() + 1.0); // this scales the unit vector's y value from [-1, 1] to a scale of [0, 1]
-    // blendedVal = (1-t)*initVal + t*andVal
-    // we return: (1-t)*white + t*blue
     return (1.0-t)*vec3(1.0, 1.0, 1.0) + t*vec3(0.5, 0.7, 1.0);
 }
 
@@ -38,6 +27,7 @@ int main() {
     const int imageWidth = 200;
     const int imageHeight = 100;
     const int samplesPerPixel = 100;
+    const int maxDepth = 50;
 
     std::cout << "P3\n" << imageWidth << ' '  << imageHeight << "\n255\n";
 
@@ -64,7 +54,7 @@ int main() {
                 auto u = random_double(i, i + 1.0) / imageWidth;
                 auto v = random_double(j, j + 1.0) / imageHeight;
                 ray sampleRay = cam.getRay(u, v);
-                colour += rayColour(sampleRay, world);
+                colour += rayColour(sampleRay, world, maxDepth);
             }
             colour.writeColour(std::cout, samplesPerPixel);
         }

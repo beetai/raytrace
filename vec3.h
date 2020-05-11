@@ -65,6 +65,14 @@ struct vec3 {
                 << static_cast<int>(255.999 * clamp(b, 0, 0.9999)) << '\n';
         }
 
+        inline static vec3 random() {
+            return vec3(random_double(), random_double(), random_double());
+        }
+
+        inline static vec3 random(double min, double max) {
+            return vec3(random_double(min, max), random_double(min, max), random_double(min, max));
+        }
+
     public:
         double e[3];
 
@@ -120,6 +128,14 @@ inline vec3 cross(const vec3 &u, const vec3 &v) {
 
 inline vec3 unitVector(vec3 v) {
     return v / v.length();
+}
+
+vec3 randomInUnitSphere() {
+    while (true) {
+        vec3 p = vec3::random(-1,1);
+        if (p.sumOfSquare() >= 1) continue;
+        return p;
+    }
 }
 
 #endif /* VEC3_H */
