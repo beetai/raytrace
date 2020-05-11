@@ -52,11 +52,17 @@ struct vec3 {
             return sqrt(sumOfSquare());
         }
 
-        void writeColour(std::ostream &out) { // TODO: make sense of the parameter
+        void writeColour(std::ostream &out, int samplesPerPixel) {
+            // Divide color total by number of samples per pixel
+            auto scale = 1.0 / samplesPerPixel;     // this is because multiplying is better than dividing? check
+            auto r = e[0] * scale;
+            auto g = e[1] * scale;
+            auto b = e[2] * scale;
+            
             // Write the translated [0,255] value of each component
-            out << static_cast<int>(255.999 * e[0]) << ' '
-                << static_cast<int>(255.999 * e[1]) << ' '
-                << static_cast<int>(255.999 * e[2]) << '\n';
+            out << static_cast<int>(255.999 * clamp(r, 0, 0.9999)) << ' '
+                << static_cast<int>(255.999 * clamp(g, 0, 0.9999)) << ' '
+                << static_cast<int>(255.999 * clamp(b, 0, 0.9999)) << '\n';
         }
 
     public:

@@ -2,6 +2,7 @@
 
 #include "hittable_list.h"
 #include "sphere.h"
+#include "camera.h"
 
 #include <iostream>
 
@@ -34,43 +35,38 @@ vec3 rayColour(const ray& r, const hittable& world) {
 }
 
 int main() {
-    const int image_width = 200;
-    const int image_height = 100;
+    const int imageWidth = 200;
+    const int imageHeight = 100;
+    const int samplesPerPixel = 100;
 
-    std::cout << "P3\n" << image_width << ' '  << image_height << "\n255\n";
-
-    // define coordinate constants
-    vec3 lowerLeftCorner(-2.0, -1.0, -1.0);
-    vec3 orig(0.0, 0.0, 0.0);
+    std::cout << "P3\n" << imageWidth << ' '  << imageHeight << "\n255\n";
 
     hittableList world;
     world.add(make_shared<sphere>(vec3(0,0,-1), 0.5));
     world.add(make_shared<sphere>(vec3(0,-100.5,-1), 100));
 
-    for (int j = image_height-1; j >= 0; --j) {
+    camera cam;
+
+    for (int j = imageHeight-1; j >= 0; --j) {
         std::cerr << "\rScanlines remaining: " << j << ' ' << std::flush;
-        for (int i = 0; i < image_width; ++i) {
-            // first print:
-            // auto r = double(i) / image_width;
-            // auto g = double(j) / image_height;
-            // auto b = 0.2;
-            // int ir = static_cast<int>(255.999 * r);
-            // int ig = static_cast<int>(255.999 * g);
-            // int ib = static_cast<int>(255.999 * b);
-            // std::cout << ir << ' ' << ig << ' ' << ib << '\n';
+        for (int i = 0; i < imageWidth; ++i) {
+            // // for each pixel, create a ray from origin to that pixel
+            // // get coordinate of pixel
+            // auto u = double(i) / imageWidth;
+            // auto v = double(j) / imageHeight;
+            // // get colour of ray and write
+            // ray pixelRay = cam.getRay(u, v);
+            // rayColour(pixelRay, world).writeColour(std::cout, 1);
 
-            // first print using vec3.h:
-            // vec3 colour(double(i) / image_width, double(j) / image_height, 0.2);
-            // colour.writeColour(std::cout);
-
-            // for each pixel, create a ray from origin to that pixel
-            // get coordinate of pixel
-            auto u = double(i) / image_width;
-            auto v = double(j) / image_height;
-            vec3 pixelCoord = lowerLeftCorner + vec3(u * 4.0, 0.0, 0.0) + vec3(0.0, v * 2.0, 0.0);
-            // get colour of ray and write
-            ray pixelRay = ray(orig, pixelCoord);
-            rayColour(pixelRay, world).writeColour(std::cout);
+            // for each pixel, take a certain number of randomly-selected rays and add them together
+            vec3 colour(0,0,0);
+            for (int s = 0; s < samplesPerPixel; ++s) {
+                auto u = random_double(i, i + 1.0) / imageWidth;
+                auto v = random_double(j, j + 1.0) / imageHeight;
+                ray sampleRay = cam.getRay(u, v);
+                colour += rayColour(sampleRay, world);
+            }
+            colour.writeColour(std::cout, samplesPerPixel);
         }
     }
     std::cerr << "\nDone.\n";
