@@ -11,9 +11,9 @@ vec3 rayColour(const ray& r, const hittable& world, int depth) {
     if (depth <= 0) return vec3(0,0,0);
 
     hitRecord rec;
-    if (world.hit(r, 0, infinity, rec)) {
+    if (world.hit(r, 0.001, infinity, rec)) {
         // return 0.5*(rec.normal + vec3(1.0, 1.0, 1.0));      // norm visualizer
-        vec3 target = rec.normal + randomInUnitSphere();
+        vec3 target = rec.normal + randomUnitVector();
         return 0.5 * rayColour(ray(rec.point, target), world, depth-1);  // new ray points randomly outward from surface of contact
     }
 

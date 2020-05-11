@@ -55,9 +55,9 @@ struct vec3 {
         void writeColour(std::ostream &out, int samplesPerPixel) {
             // Divide color total by number of samples per pixel
             auto scale = 1.0 / samplesPerPixel;     // this is because multiplying is better than dividing? check
-            auto r = e[0] * scale;
-            auto g = e[1] * scale;
-            auto b = e[2] * scale;
+            auto r = sqrt(e[0] * scale);            // sqrt for gamma correction: gamma 2 (take value^(1/gamma))
+            auto g = sqrt(e[1] * scale);
+            auto b = sqrt(e[2] * scale);
             
             // Write the translated [0,255] value of each component
             out << static_cast<int>(255.999 * clamp(r, 0, 0.9999)) << ' '
@@ -136,6 +136,13 @@ vec3 randomInUnitSphere() {
         if (p.sumOfSquare() >= 1) continue;
         return p;
     }
+}
+
+vec3 randomUnitVector() {
+    auto theta = random_double(0, 2*pi);
+    auto z = random_double(-1, 1);
+    auto r = random_double(0, 1);
+    return vec3(r*cos(theta), r*sin(theta), z);
 }
 
 #endif /* VEC3_H */
