@@ -41,26 +41,20 @@ int main() {
 
     hittableList world;
     world.add(make_shared<sphere>(
-        vec3(0,0,-1), 0.5, make_shared<lambertian>(vec3(0.7, 0.3, 0.3))));                  // middle sphere
+        vec3(0,0,-1), 0.5, make_shared<lambertian>(vec3(0.1, 0.2, 0.5))));                  // middle sphere
     world.add(make_shared<sphere>(
         vec3(0,-100.5,-1), 100, make_shared<lambertian>(vec3(0.8, 0.8, 0.0))));             // the ground
 
-    world.add(make_shared<sphere>(vec3(1,0,-1), 0.5, make_shared<metal>(vec3(0.8, 0.6, 0.2), 1.0)));
-    world.add(make_shared<sphere>(vec3(-1,0,-1), 0.5, make_shared<metal>(vec3(0.8, 0.8, 0.8), 0.3)));
+    world.add(make_shared<sphere>(vec3(1,0,-1), 0.5, make_shared<metal>(vec3(0.8, 0.6, 0.2), 0.3)));        // right sphere
+    // world.add(make_shared<sphere>(vec3(-1,0,-1), 0.5, make_shared<metal>(vec3(0.8, 0.8, 0.8), 0.3)));       // left sphere
+    world.add(make_shared<sphere>(vec3(-1,0,-1), 0.5, make_shared<dielectric>(1.5)));
+    world.add(make_shared<sphere>(vec3(-1,0,-1), -0.45, make_shared<dielectric>(1.5)));     // create a hollow glass sphere
 
     camera cam;
 
     for (int j = imageHeight-1; j >= 0; --j) {
         std::cerr << "\rScanlines remaining: " << j << ' ' << std::flush;
         for (int i = 0; i < imageWidth; ++i) {
-            // // for each pixel, create a ray from origin to that pixel
-            // // get coordinate of pixel
-            // auto u = double(i) / imageWidth;
-            // auto v = double(j) / imageHeight;
-            // // get colour of ray and write
-            // ray pixelRay = cam.getRay(u, v);
-            // rayColour(pixelRay, world).writeColour(std::cout, 1);
-
             // for each pixel, take a certain number of randomly-selected rays and add them together
             vec3 colour(0,0,0);
             for (int s = 0; s < samplesPerPixel; ++s) {

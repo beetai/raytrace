@@ -157,4 +157,11 @@ vec3 reflect(const vec3& in, const vec3& norm) {
     return in - 2*dot(in, norm)*norm;
 }
 
+vec3 refract(const vec3& in, const vec3& norm, double eta_over_etap) {
+    auto cos_theta = dot(-in, norm);
+    vec3 r_out_parallel = eta_over_etap * (in + cos_theta * norm);
+    vec3 r_out_perp = - sqrt(1.0 - r_out_parallel.sumOfSquare()) * norm;
+    return r_out_parallel + r_out_perp;
+}
+
 #endif /* VEC3_H */
