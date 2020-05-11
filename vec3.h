@@ -145,4 +145,12 @@ vec3 randomUnitVector() {
     return vec3(r*cos(theta), r*sin(theta), z);
 }
 
+vec3 randomInHemisphere(const vec3& normal) {
+    vec3 inUnitSphere = randomInUnitSphere();
+    if (dot(inUnitSphere, normal) > 0.0)    // point in same direction
+        return inUnitSphere;
+    else
+        return -inUnitSphere;
+}
+
 #endif /* VEC3_H */

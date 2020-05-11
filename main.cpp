@@ -13,8 +13,10 @@ vec3 rayColour(const ray& r, const hittable& world, int depth) {
     hitRecord rec;
     if (world.hit(r, 0.001, infinity, rec)) {
         // return 0.5*(rec.normal + vec3(1.0, 1.0, 1.0));      // norm visualizer
-        vec3 target = rec.normal + randomUnitVector();
-        return 0.5 * rayColour(ray(rec.point, target), world, depth-1);  // new ray points randomly outward from surface of contact
+        // vec3 target = rec.normal + randomInUnitSphere();                    // cos^3(phi) diffuse renderer
+        vec3 target = rec.normal + randomUnitVector();                      // Lambertian (cos(phi)) diffuse renderer
+        // vec3 target = randomInHemisphere(rec.normal);                       // Hemispherical scattering
+        return 0.5 * rayColour(ray(rec.point, target), world, depth-1);     // new ray points randomly outward from surface of contact
     }
 
     // render blue white gradient bg
