@@ -5,25 +5,36 @@
 
 class camera {
     public:
-        camera() {
-            origin = vec3(0,0,0);
-            lower_left_corner = vec3(-2,-1,-1);
-            frame_width = 4.0;
-            frame_height = 2.0;
+        camera(
+            vec3 lookfrom, vec3 lookat, vec3 vup,
+            double vfov,        // top to bottom in degrees
+            double aspect
+        ) {
+            origin = lookfrom;
+            vec3 u, v, w;
+
+            auto theta = degrees_to_radians(vfov);
+            auto half_height = tan(theta / 2);
+            auto half_width = aspect * half_height;
+            w = unit_vector(lookfrom - lookat);
+            u = unit_vector(cross(vup, w));         // TODO: this part doesn't make sense to me
+            v = cross(w, u);
+
+            lower_left_corner = origin - half_width*u - half_height*v - w;
+            horizontal = 2*half_width*u;
+            vertical = 2*half_height*v;
         }
 
-        ray get_ray(double u, double v) {
-            vec3 point_coord = lower_left_corner + vec3(u * frame_width, 0.0, 0.0) + vec3(0.0, v * frame_height, 0.0) - origin;
+        ray get_ray(double s, double t) {
+            vec3 point_coord = lower_left_corner + s*horizontal + t*vertical - origin;
             return ray(origin, point_coord);
         }
 
     public:
         vec3 origin;
         vec3 lower_left_corner;
-        // vec3 frame_width;
-        double frame_width;
-        // vec3 frame_height;
-        double frame_height;
+        vec3 horizontal;
+        vec3 vertical;
 };
 
 #endif /* CAMERA_H */
