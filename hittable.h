@@ -1,11 +1,14 @@
 #ifndef HITTABLE_H
 #define HITTABLE_H
 
+// #include "rtweekend.h"
 #include "ray.h"
+class material;     // alert compiler that the pointer is to a class
 
 struct hitRecord {
     vec3 point;
     vec3 normal;
+    shared_ptr<material> mat_ptr;
     double t;
     bool frontFace;
 

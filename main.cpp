@@ -3,6 +3,7 @@
 #include "hittable_list.h"
 #include "sphere.h"
 #include "camera.h"
+#include "material.h"
 
 #include <iostream>
 
@@ -14,9 +15,14 @@ vec3 rayColour(const ray& r, const hittable& world, int depth) {
     if (world.hit(r, 0.001, infinity, rec)) {
         // return 0.5*(rec.normal + vec3(1.0, 1.0, 1.0));      // norm visualizer
         // vec3 target = rec.normal + randomInUnitSphere();                    // cos^3(phi) diffuse renderer
-        vec3 target = rec.normal + randomUnitVector();                      // Lambertian (cos(phi)) diffuse renderer
+        // vec3 target = rec.normal + randomUnitVector();                      // Lambertian (cos(phi)) diffuse renderer
         // vec3 target = randomInHemisphere(rec.normal);                       // Hemispherical scattering
-        return 0.5 * rayColour(ray(rec.point, target), world, depth-1);     // new ray points randomly outward from surface of contact
+
+        vec3 attenuation;
+        ray scatterDir;
+        if (rec.mat_ptr->scatter(r, rec, attenuation, scatterDir))
+            return attenuation * rayColour(scatterDir, world, depth-1);
+        return vec3(0,0,0);     // new ray points randomly outward from surface of contact
     }
 
     // render blue white gradient bg
@@ -34,8 +40,13 @@ int main() {
     std::cout << "P3\n" << imageWidth << ' '  << imageHeight << "\n255\n";
 
     hittableList world;
-    world.add(make_shared<sphere>(vec3(0,0,-1), 0.5));
-    world.add(make_shared<sphere>(vec3(0,-100.5,-1), 100));
+    world.add(make_shared<sphere>(
+        vec3(0,0,-1), 0.5, make_shared<lambertian>(vec3(0.7, 0.3, 0.3))));                  // middle sphere
+    world.add(make_shared<sphere>(
+        vec3(0,-100.5,-1), 100, make_shared<lambertian>(vec3(0.8, 0.8, 0.0))));             // the ground
+
+    world.add(make_shared<sphere>(vec3(1,0,-1), 0.5, make_shared<metal>(vec3(0.8, 0.6, 0.2))));
+    world.add(make_shared<sphere>(vec3(-1,0,-1), 0.5, make_shared<metal>(vec3(0.8, 0.8, 0.8))));
 
     camera cam;
 

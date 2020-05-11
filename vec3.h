@@ -153,4 +153,8 @@ vec3 randomInHemisphere(const vec3& normal) {
         return -inUnitSphere;
 }
 
+vec3 reflect(const vec3& in, const vec3& norm) {
+    return in - 2*dot(in, norm)*norm;
+}
+
 #endif /* VEC3_H */
