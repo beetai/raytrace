@@ -164,4 +164,12 @@ vec3 refract(const vec3& in, const vec3& norm, double eta_over_etap) {
     return r_out_parallel + r_out_perp;
 }
 
+vec3 random_in_unit_disk() {
+    while (true) {
+        vec3 p = vec3(random_double(-1, 1), random_double(-1, 1), 0.0);
+        if (p.sum_of_square() >= 1) continue;
+        return p;
+    }
+}
+
 #endif /* VEC3_H */
